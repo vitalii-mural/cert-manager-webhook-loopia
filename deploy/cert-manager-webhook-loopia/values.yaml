@@ -13,7 +13,7 @@ certManager:
   serviceAccountName: cert-manager
 
 image:
-  repository: ExhaleSthlm/cert-manager-webhook-loopia
+  repository: Identitry/cert-manager-webhook-loopia
   tag: 1.0
   pullPolicy: IfNotPresent
 
