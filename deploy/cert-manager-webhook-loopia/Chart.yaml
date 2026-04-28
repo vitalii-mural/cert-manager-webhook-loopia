@@ -4,4 +4,4 @@ name: cert-manager-webhook-loopia
 version: 0.1
 maintainers:
   - name: Henrik Nilsson, Identitry
-    url: https://github.com/Identitry/cert-manager-webhook-loopia
+    url: https://github.com/ExhaleSthlm/cert-manager-webhook-loopia
