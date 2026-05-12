@@ -97,7 +97,7 @@ func (c *loopiaDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 	klog.V(2).Infof("Extracted  subdomain=%s and domain=%s", subdomain, domain)
 
 	// Get loopia records for subdomain.
-	zoneRecords, err := loopiaClient.GetZoneRecords(domain, subdomain)
+	zoneRecords, err := getZoneRecords(loopiaClient, creds, domain, subdomain)
 	if err != nil {
 		klog.V(2).Infof("Subdomain %s is not present, needs to be created", subdomain)
 	} else {
@@ -123,18 +123,79 @@ func (c *loopiaDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {
 	// Record isn't present, create it, subdomain is created automatically.
 	err = loopiaClient.AddZoneRecord(domain, subdomain, &record)
 	if err != nil {
-		return fmt.Errorf("unable to create txt-record: %v", err)
-	} else {
+		if !isLoopiaSignatureFault(err) {
+			return fmt.Errorf("unable to create txt-record: %v", err)
+		}
 
-		// Verify the record has been created by checking it's id.
-		if record.ID != 0 {
-			klog.V(2).Infof("Successfully created txt-record in %s subdomain", subdomain)
-		} else {
-			return fmt.Errorf("unexpected error: txt-record was not created: %v", err)
+		klog.V(2).Infof("Retrying addZoneRecord without reseller customer_number parameter after Loopia signature fault")
+		if retryErr := addZoneRecordWithoutCustomerNumber(loopiaClient, creds, domain, subdomain, &record); retryErr != nil {
+			return fmt.Errorf("unable to create txt-record: %v; retry without customer_number failed: %v", err, retryErr)
 		}
 	}
 
+	if err := verifyZoneRecord(loopiaClient, creds, domain, subdomain, ch.Key); err != nil {
+		return err
+	}
+	klog.V(2).Infof("Successfully created txt-record in %s subdomain", subdomain)
+
 	return nil
+}
+
+func getZoneRecords(loopiaClient *loopia.API, creds *credential, domain, subdomain string) ([]loopia.Record, error) {
+	zoneRecords, err := loopiaClient.GetZoneRecords(domain, subdomain)
+	if err == nil || !isLoopiaSignatureFault(err) {
+		return zoneRecords, err
+	}
+
+	var fallbackZoneRecords []loopia.Record
+	fallbackErr := loopiaClient.XMLRPCClient().Call("getZoneRecords", []interface{}{
+		creds.Username,
+		creds.Password,
+		domain,
+		subdomain,
+	}, &fallbackZoneRecords)
+	if fallbackErr != nil {
+		return nil, fmt.Errorf("%v; retry without customer_number failed: %v", err, fallbackErr)
+	}
+
+	return fallbackZoneRecords, nil
+}
+
+func addZoneRecordWithoutCustomerNumber(loopiaClient *loopia.API, creds *credential, domain, subdomain string, record *loopia.Record) error {
+	var status string
+	err := loopiaClient.XMLRPCClient().Call("addZoneRecord", []interface{}{
+		creds.Username,
+		creds.Password,
+		domain,
+		subdomain,
+		record,
+	}, &status)
+	if err != nil {
+		return err
+	}
+	if status != "OK" {
+		return fmt.Errorf("unexpected status from Loopia: %s", status)
+	}
+	return nil
+}
+
+func verifyZoneRecord(loopiaClient *loopia.API, creds *credential, domain, subdomain, value string) error {
+	zoneRecords, err := getZoneRecords(loopiaClient, creds, domain, subdomain)
+	if err != nil {
+		return fmt.Errorf("unable to verify txt-record: %v", err)
+	}
+
+	for _, zoneRecord := range zoneRecords {
+		if zoneRecord.Type == "TXT" && zoneRecord.Value == value {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("unexpected error: txt-record was not created")
+}
+
+func isLoopiaSignatureFault(err error) bool {
+	return err != nil && strings.Contains(err.Error(), "Fault(623)")
 }
 
 // CleanUp should delete the relevant TXT record from the DNS provider console.
@@ -169,7 +230,7 @@ func (c *loopiaDNSProviderSolver) CleanUp(ch *v1alpha1.ChallengeRequest) error {
 	klog.V(2).Infof("Cleanup for subdomain=%s, domain=%s", subdomain, domain)
 
 	// Get loopia records for subdomain.
-	zoneRecords, err := loopiaClient.GetZoneRecords(domain, subdomain)
+	zoneRecords, err := getZoneRecords(loopiaClient, creds, domain, subdomain)
 	if err != nil {
 		return fmt.Errorf("unable to get zone records: %v", err)
 	}

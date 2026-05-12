@@ -13,7 +13,7 @@ certManager:
   serviceAccountName: cert-manager
 
 image:
-  repository: identitry/cert-manager-webhook-loopia
+  repository: vitalii-mural/cert-manager-webhook-loopia
   tag: 1.1
   pullPolicy: IfNotPresent
 
