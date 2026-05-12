@@ -6,9 +6,9 @@
 
 `cert-manager-webhook-loopia` is an ACME webhook for [Cert-Manager](https://cert-manager.io/) that allows for [Cert-Manager] to use `DNS-01` challenge against the [Loopia](https://loopia.com) DNS.
 
-[![test](https://github.com/Identitry/cert-manager-webhook-loopia/actions/workflows/test.yml/badge.svg)](https://github.com/Identitry/cert-manager-webhook-loopia/actions/workflows/test.yml)
+[![test](https://github.com/vitalii-mural/cert-manager-webhook-loopia/actions/workflows/test.yml/badge.svg)](https://github.com/vitalii-mural/cert-manager-webhook-loopia/actions/workflows/test.yml)
 
-[![release](https://github.com/Identitry/cert-manager-webhook-loopia/actions/workflows/release.yml/badge.svg)](https://github.com/Identitry/cert-manager-webhook-loopia/actions/workflows/release.yml)
+[![release](https://github.com/vitalii-mural/cert-manager-webhook-loopia/actions/workflows/release.yml/badge.svg)](https://github.com/vitalii-mural/cert-manager-webhook-loopia/actions/workflows/release.yml)
 
 ## Table of Contents
 
@@ -67,8 +67,8 @@ make build
 
 ### 1.2. Docker Image
 
-An image is hosted on Docker Hub:
-[identitry/cert-manager-webhook-loopia](https://hub.docker.com/repository/docker/identitry/cert-manager-webhook-loopia)
+An image is hosted on GitHub Packages / GHCR:
+[ghcr.io/vitalii-mural/cert-manager-webhook-loopia](https://github.com/vitalii-mural/cert-manager-webhook-loopia/pkgs/container/cert-manager-webhook-loopia)
 
 ### 1.3. Compatibility
 
@@ -123,12 +123,12 @@ Note that it might take a minute or two before all pods are running.
 The `cert-manager-webhook-loopia` can be installed in multiple ways but the easiest is using helm:
 
 ```shell
-helm repo add identitry https://identitry.github.io/cert-manager-webhook-loopia
+helm repo add vitalii-mural https://vitalii-mural.github.io/cert-manager-webhook-loopia
 helm repo update
-helm install cert-manager-webhook-loopia identitry/cert-manager-webhook-loopia --namespace cert-manager
+helm install cert-manager-webhook-loopia vitalii-mural/cert-manager-webhook-loopia --namespace cert-manager
 ```
 
-This will install a helm chart with the pre built image available in Docker Hub as identitry/cert-manager-webhook-loopia.
+This will install a helm chart with the pre built image available in GitHub Packages / GHCR as ghcr.io/vitalii-mural/cert-manager-webhook-loopia.
 
 If you wish to uninstall `cert-manager-webhook-loopia` simply run this command:
 
@@ -318,5 +318,5 @@ The testing of a cert-manager weebhook is a bit special and not a typical unit o
 [Loopia Customer Zone]: https://www.loopia.com/login
 [Loopia API]: https://doc.livedns.loopia.com
 [Helm]: https://helm.sh
-[image tags]: https://hub.docker.com/repository/docker/identitry/cert-manager-webhook-loopia
+[image tags]: https://github.com/vitalii-mural/cert-manager-webhook-loopia/pkgs/container/cert-manager-webhook-loopia
 [Kubernetes]: https://kubernetes.io

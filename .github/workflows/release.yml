@@ -1,7 +1,7 @@
 name: release
 ### Workflow for testing, building and releasing cert-manager-webhook-loopia ###
 ### Tests are executed using a test-fixure supplied that build up a complete Kubernetes control plane ###
-### Deployment is made to DockerHub ###
+### Container image is published to GitHub Packages / GHCR ###
 
 # Run on push tag or manually.
 on:
@@ -18,9 +18,12 @@ on:
       - "**.yaml"
       - "Dockerfile"
 jobs:
-  # Build docker image and push to Docker Hub (depends on teststrict).
-  release_docker:
+  # Build container image and push to GitHub Packages / GHCR.
+  release_github_package:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       # Echo...
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -38,13 +41,13 @@ jobs:
         with:
           fallback: 1.1 # Optional fallback tag to use when no tag can be found
 
-      # Get GITHUB_REPOSITORY and lowercase it to GITHUB_REPOSITORY_LC env variable.
-      - name: Set GITHUB_REPOSITORY_LC env
-        run: echo "GITHUB_REPOSITORY_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-      - name: Test GITHUB_REPOSITORY_LC env
+      # Get GITHUB_REPOSITORY and lowercase it to GHCR_IMAGE env variable.
+      - name: Set GHCR image env
+        run: echo "GHCR_IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+      - name: Test GHCR image env
         run: |
-          echo $GITHUB_REPOSITORY_LC
-          echo ${{ env.GITHUB_REPOSITORY_LC }}
+          echo $GHCR_IMAGE
+          echo ${{ env.GHCR_IMAGE }}
 
       # Download a specific version of the Go tool.
       - name: Setup Go
@@ -56,20 +59,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      # Log in to DockerHub.
-      - name: Login to DockerHub
+      # Log in to GitHub Container Registry.
+      - name: Login to GHCR
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build using Dockerfile and push to DockerHub.
-      - name: Build and push to DockerHub
+      # Build using Dockerfile and push to GitHub Packages / GHCR.
+      - name: Build and push to GHCR
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ env.GITHUB_REPOSITORY_LC }}:latest, ${{ env.GITHUB_REPOSITORY_LC }}:${{ steps.previoustag.outputs.tag }}
+          tags: ${{ env.GHCR_IMAGE }}:latest, ${{ env.GHCR_IMAGE }}:${{ steps.previoustag.outputs.tag }}
 
   # Build helm chart and push to GitHub Pages (depends on teststrict).
   release_helmchart:

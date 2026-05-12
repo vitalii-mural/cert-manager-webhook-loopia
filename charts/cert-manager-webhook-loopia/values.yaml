@@ -13,7 +13,7 @@ certManager:
   serviceAccountName: cert-manager
 
 image:
-  repository: vitalii-mural/cert-manager-webhook-loopia
+  repository: ghcr.io/vitalii-mural/cert-manager-webhook-loopia
   tag: 1.1
   pullPolicy: IfNotPresent
 
