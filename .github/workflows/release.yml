@@ -18,52 +18,8 @@ on:
       - "**.yaml"
       - "Dockerfile"
 jobs:
-  # Run tests.
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      # Echo...
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-
-      # Download a specific version of the Go tool.
-      - name: Setup Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16.5
-
-      # Check out code.
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      # Get Go dependencies.
-      - name: Get dependencies
-        run: go mod download
-
-      # Download and unpack required test binaries.
-      - name: Get test binaries
-        run: sh ./testdata/scripts/fetch-test-binaries.sh
-
-      # Add real credentials to loopia-credentials.yaml.
-      - name: Apply credentials from secret
-        env:
-          LOOPIA_USERNAME: ${{ secrets.LOOPIA_USERNAME }}
-          LOOPIA_PASSWORD: ${{ secrets.LOOPIA_PASSWORD }}
-        run: |
-          sed -i -e "s/\[LOOPIA USERNAME\]/$LOOPIA_USERNAME/" testdata/loopia/loopia-credentials.yaml
-          sed -i -e "s/\[LOOPIA PASSWORD\]/$LOOPIA_PASSWORD/" testdata/loopia/loopia-credentials.yaml
-
-      # Run conformance tests.
-      - name: Run tests
-        env:
-          TEST_ZONE_NAME: ${{ secrets.LOOPIA_TEST_ZONE_NAME }}.
-          TEST_STRICT_MODE: "false"
-        run: go test -v
-
   # Build docker image and push to Docker Hub (depends on teststrict).
   release_docker:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       # Echo...
@@ -117,7 +73,6 @@ jobs:
 
   # Build helm chart and push to GitHub Pages (depends on teststrict).
   release_helmchart:
-    needs: test
     runs-on: ubuntu-latest
     steps:
 

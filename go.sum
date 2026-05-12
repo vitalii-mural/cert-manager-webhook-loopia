@@ -512,6 +512,8 @@ github.com/jonlil/loopia-go v0.0.0-20210331190659-ff1ae8413d68 h1:L0laboa/xuoWRY
 github.com/jonlil/loopia-go v0.0.0-20210331190659-ff1ae8413d68/go.mod h1:Vkp4MTf4Pb8Lu5zPQSQB777pyKa2AJcJPBd7lLp/aNY=
 github.com/jonlil/loopia-go v0.0.0-20210527200300-23293e4c6c36 h1:dDla7M09HPLLoRomdOO9ATz0tSZS/ADjEI9ZU3REPhs=
 github.com/jonlil/loopia-go v0.0.0-20210527200300-23293e4c6c36/go.mod h1:Vkp4MTf4Pb8Lu5zPQSQB777pyKa2AJcJPBd7lLp/aNY=
+github.com/jonlil/loopia-go v0.0.0-20220617090554-b07b4c905b28 h1:OapBn2q0A+fnMTLhCHv1tE4+RZiwsKhUQP3/qAvunJk=
+github.com/jonlil/loopia-go v0.0.0-20220617090554-b07b4c905b28/go.mod h1:Vkp4MTf4Pb8Lu5zPQSQB777pyKa2AJcJPBd7lLp/aNY=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.7/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
 github.com/json-iterator/go v1.1.8/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
